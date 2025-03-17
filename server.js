@@ -11,7 +11,7 @@ const app = express();
 
 // Configura CORS
 app.use(cors({
-    origin: 'https://imperquimia-vacaciones.vercel.app',
+    origin: 'https://imperquimia-vacaciones-b4kai4djq-davidprojects-projects.vercel.app',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }));
