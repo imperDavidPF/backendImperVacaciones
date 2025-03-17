@@ -43,7 +43,7 @@ const transporter = nodemailer.createTransport({
 
 // Ruta para enviar el correo al supervisor
 app.post('/send-email', async (req, res) => {
-    const { supervisorEmail, nombreEmpleado, numeroEmpleado, departamento, fechaInicio, fechaFin, diasSolicitados, comentarios, nombreSupervisor, emailSolicitante, requestId, responsableNominas, emailNominas } = req.body;
+    const { supervisorEmail, nombreEmpleado, numeroEmpleado, departamento, fechaInicio, fechaFin, diasSolicitados, comentarios, nombreSupervisor, emailSolicitante, requestId } = req.body;
 
     // Crear el contenido HTML del correo con botones de Aceptar y Rechazar
     const htmlContent = `
@@ -114,74 +114,7 @@ app.post('/send-email', async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-
-        // Enviar correo al responsable de nóminas
-        if (emailNominas) {
-            const mailOptionsNominas = {
-                from: 'dpromontor@imperquimia.com.mx',
-                to: emailNominas,
-                subject: 'Confirmación de Vacaciones',
-                html: `
-                    <html>
-                        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;">
-                            <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2" style="font-size: 20px; background-color: #4CAF50; color: white; padding: 12px; text-align: left;">
-                                                Hola ${responsableNominas}, tienes una nueva solicitud de vacaciones de ${nombreEmpleado}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Nombre:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${nombreEmpleado}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Número de Empleado:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${numeroEmpleado}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Departamento:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${departamento}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Fecha de Inicio:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${fechaInicio}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Fecha de Fin:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${fechaFin}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Días Solicitados:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${diasSolicitados}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Comentarios:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${comentarios}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div style="text-align: center; padding: 20px;">
-                                    <a href="https://backendimpervacaciones.onrender.com/confirmar-vacaciones/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                                        Confirmar Vacaciones
-                                    </a>
-                                </div>
-                                <div style="text-align: center; padding: 10px; font-size: 12px; color: #777;">
-                                    Este es un correo automático, por favor no responder.
-                                </div>
-                            </div>
-                        </body>
-                    </html>
-                `
-            };
-
-            await transporter.sendMail(mailOptionsNominas);
-        }
-
-        res.status(200).send('Correo enviado al supervisor y al responsable de nóminas.');
+        res.status(200).send('Correo enviado al supervisor.');
     } catch (error) {
         console.error('Error al enviar el correo:', error);
         res.status(500).send('Error al enviar el correo: ' + error.toString());
@@ -201,7 +134,7 @@ app.get('/aceptar/:requestId', async (req, res) => {
             return res.status(404).send('Solicitud no encontrada.');
         }
 
-        const { nombreEmpleado, fechaInicio, fechaFin, diasSolicitados, emailSolicitante } = requestDoc.data();
+        const { nombreEmpleado, fechaInicio, fechaFin, diasSolicitados, emailSolicitante, responsableNominas, emailNominas } = requestDoc.data();
 
         // Validar que los campos requeridos estén presentes
         if (!emailSolicitante || !nombreEmpleado || !fechaInicio || !fechaFin || !diasSolicitados) {
@@ -271,6 +204,72 @@ app.get('/aceptar/:requestId', async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
+
+        // Enviar correo al responsable de nóminas solo si la solicitud fue aceptada
+        if (emailNominas) {
+            const mailOptionsNominas = {
+                from: 'dpromontor@imperquimia.com.mx',
+                to: emailNominas,
+                subject: 'Confirmación de Vacaciones',
+                html: `
+                    <html>
+                        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;">
+                            <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2" style="font-size: 20px; background-color: #4CAF50; color: white; padding: 12px; text-align: left;">
+                                                Hola ${responsableNominas}, tienes una nueva solicitud de vacaciones de ${nombreEmpleado}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Nombre:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${nombreEmpleado}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Número de Empleado:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${numeroEmpleado}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Departamento:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${departamento}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Fecha de Inicio:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${fechaInicio}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Fecha de Fin:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${fechaFin}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Días Solicitados:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${diasSolicitados}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Comentarios:</strong></td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${comentarios}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div style="text-align: center; padding: 20px;">
+                                    <a href="https://backendimpervacaciones.onrender.com/confirmar-vacaciones/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                                        Confirmar Vacaciones
+                                    </a>
+                                </div>
+                                <div style="text-align: center; padding: 10px; font-size: 12px; color: #777;">
+                                    Este es un correo automático, por favor no responder.
+                                </div>
+                            </div>
+                        </body>
+                    </html>
+                `
+            };
+
+            await transporter.sendMail(mailOptionsNominas);
+        }
 
         // Enviar una respuesta HTML con estilos para la ventana emergente
         res.status(200).send(`
