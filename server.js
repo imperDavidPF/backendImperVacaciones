@@ -90,10 +90,10 @@ app.post('/send-email', async (req, res) => {
                         </tbody>
                     </table>
                     <div style="text-align: center; padding: 20px;">
-                        <a href="https://backendimpervacaciones.onrender.com/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                        <a href="https://backendimpervacaciones.onrender.com/aceptar/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
                             Aceptar
                         </a>
-                        <a href="https://backendimpervacaciones.onrender.com/${requestId}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                        <a href="https://backendimpervacaciones.onrender.com/rechazar/${requestId}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                             Rechazar
                         </a>
                     </div>
@@ -188,35 +188,6 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
-app.get('/confirmar-vacaciones/:requestId', async (req, res) => {
-    const { requestId } = req.params;
-
-    try {
-        // Recuperar la solicitud de Firestore
-        const requestRef = doc(db, 'vacationRequests', requestId);
-        const requestDoc = await getDoc(requestRef);
-
-        if (!requestDoc.exists()) {
-            return res.status(404).send('Solicitud no encontrada.');
-        }
-
-        // Actualizar el estado en Firestore
-        await updateDoc(requestRef, { confirmacion_nominas: 'vacaciones registradas' });
-
-        res.status(200).send(`
-            <div style="background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; align-items: center;">
-                <h1 style="font-size: 24px; margin: 0; font-family: Arial, sans-serif;">
-                    Vacaciones confirmadas y registradas en nóminas.
-                </h1>
-            </div>
-        `);
-    } catch (error) {
-        console.error('Error al confirmar las vacaciones:', error);
-        res.status(500).send('Error al confirmar las vacaciones: ' + error.toString());
-    }
-});
-
-
 // Ruta para manejar la aceptación de la solicitud
 app.get('/aceptar/:requestId', async (req, res) => {
     const { requestId } = req.params;
@@ -307,7 +278,6 @@ app.get('/aceptar/:requestId', async (req, res) => {
                 <h1 style="font-size: 24px; margin: 0; font-family: Arial, sans-serif;">
                     Solicitud aceptada y correo enviado al solicitante.
                 </h1>
-
             </div>
         `);
     } catch (error) {
@@ -336,7 +306,6 @@ app.get('/rechazar/:requestId', async (req, res) => {
         }
         // Actualizar el estado en Firestore
         await updateDoc(requestRef, { aprobado: 'Rechazado' });
-
 
         // Enviar correo al solicitante notificando el rechazo
         const mailOptions = {
@@ -396,7 +365,6 @@ app.get('/rechazar/:requestId', async (req, res) => {
                 <h1 style="font-size: 24px; margin: 0; font-family: Arial, sans-serif;">
                     Solicitud rechazada y correo enviado al solicitante.
                 </h1>
-
             </div>
         `);
     } catch (error) {
