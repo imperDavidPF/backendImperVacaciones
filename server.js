@@ -11,7 +11,7 @@ const app = express();
 
 // Configura CORS
 app.use(cors({
-    origin: 'http://localhost:5000',
+    origin: 'https://imperquimia-vacaciones.vercel.app',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
 }));
@@ -90,10 +90,10 @@ app.post('/send-email', async (req, res) => {
                         </tbody>
                     </table>
                     <div style="text-align: center; padding: 20px;">
-                        <a href="http://localhost:3000/aceptar/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+                        <a href="https://backendimpervacaciones.onrender.com/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
                             Aceptar
                         </a>
-                        <a href="http://localhost:3000/rechazar/${requestId}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                        <a href="https://backendimpervacaciones.onrender.com/${requestId}" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                             Rechazar
                         </a>
                     </div>
@@ -165,7 +165,7 @@ app.post('/send-email', async (req, res) => {
                                     </tbody>
                                 </table>
                                 <div style="text-align: center; padding: 20px;">
-                                    <a href="http://localhost:3000/confirmar-vacaciones/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                                    <a href="https://backendimpervacaciones.onrender.com/confirmar-vacaciones/${requestId}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
                                         Confirmar Vacaciones
                                     </a>
                                 </div>
