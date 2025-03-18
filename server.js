@@ -134,7 +134,7 @@ app.get('/aceptar/:requestId', async (req, res) => {
             return res.status(404).send('Solicitud no encontrada.');
         }
 
-        const { nombreEmpleado, numeroEmpleado, departamento, fechaInicio, fechaFin, diasSolicitados, emailSolicitante, responsableNominas, emailNominas } = requestDoc.data();
+        const { nombreEmpleado, numeroEmpleado, departamento, fechaInicio, fechaFin, diasSolicitados, emailSolicitante, responsableNominas, emailNominas, comentarios } = requestDoc.data();
 
         // Validar que los campos requeridos estén presentes
         if (!emailSolicitante || !nombreEmpleado || !fechaInicio || !fechaFin || !diasSolicitados) {
@@ -250,7 +250,7 @@ app.get('/aceptar/:requestId', async (req, res) => {
                                         </tr>
                                         <tr>
                                             <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>Comentarios:</strong></td>
-                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${comentarios}</td>
+                                            <td style="padding: 12px; border-bottom: 1px solid #ddd;">${comentarios || 'Sin comentarios'}</td>
                                         </tr>
                                     </tbody>
                                 </table>
